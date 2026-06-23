@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  onboarding_service:
+    build: ./onboarding_service
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./onboarding_service/.env
+    depends_on:
+      - kafka
+
+  integrations_service:
+    build: ./integrations_service
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./integrations_service/.env
+    depends_on:
+      - kafka
+
+  scoring_service:
+    build: ./scoring_service
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./scoring_service/.env
+    depends_on:
+      - kafka
+
+  credit_core_service:
+    build: ./credit_core_service
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./credit_core_service/.env
+    depends_on:
+      - kafka
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - onboarding_service
+      - integrations_service
+      - scoring_service
+      - credit_core_service
