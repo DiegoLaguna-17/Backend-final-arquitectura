@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.43.0",
+    "axios": "^1.18.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "kafkajs": "^2.2.4"
+    "kafkajs": "^2.2.4",
+    "opossum": "^9.0.0"
   }
 }
