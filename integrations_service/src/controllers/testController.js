@@ -3,32 +3,27 @@ const supabase = require('../config/supabaseClient');
 exports.testDb = async (req, res) => {
   try {
     if (!supabase) {
-       return res.json({
-         service: 'integrations_service',
-         db: 'error',
-         error: 'Supabase client is not initialized.'
-       });
-    }
-    
-    const { data, error } = await supabase.from('test_table_mock').select('*').limit(1);
-    
-    if (error && error.code === '42P01') {
-      return res.json({
-        service: 'integrations_service',
-        db: 'connected',
-        error: null
-      });
-    } else if (error) {
       return res.json({
         service: 'integrations_service',
         db: 'error',
-        error: error.message || error
+        error: 'Supabase client no inicializado. Revisa SUPABASE_URL y SUPABASE_KEY en .env'
+      });
+    }
+
+    const { data, error } = await supabase.from('usuarios').select('count').limit(1);
+
+    if (error) {
+      return res.json({
+        service: 'integrations_service',
+        db: 'error',
+        error: error.message
       });
     }
 
     res.json({
       service: 'integrations_service',
-      db: 'connected',
+      db: 'connected ✅',
+      mensaje: 'Conexión a Supabase exitosa',
       error: null
     });
   } catch (err) {
