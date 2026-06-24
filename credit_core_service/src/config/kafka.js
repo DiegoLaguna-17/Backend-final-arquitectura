@@ -4,7 +4,11 @@ const broker = process.env.KAFKA_BROKER || 'kafka:9092';
 
 const kafka = new Kafka({
   clientId: 'neolend-client',
-  brokers: [broker]
+  brokers: [broker],
+  retry: {
+    initialRetryTime: 100,
+    retries: 1
+  }
 });
 
 const producer = kafka.producer();
